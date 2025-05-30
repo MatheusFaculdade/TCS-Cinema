@@ -3,6 +3,7 @@ import 'bootstrap/dist/css/bootstrap.min.css'
 import 'bootstrap-icons/font/bootstrap-icons.css'
 import './App.css'
 import { Navbar } from './components/Navbar'
+import { AppRoutes } from './routes'
 
 function App() {
   useEffect(() => {
@@ -16,21 +17,7 @@ function App() {
   return (
     <>
       <Navbar />
-
-      <div className="container mt-4">
-        <h1>Dashboard</h1>
-        <hr />
-
-        <section className="mt-5">
-          <h3>Últimos Ingressos</h3>
-          <div id="ultimos-ingressos" className="row g-4"></div>
-        </section>
-
-        <section className="mt-5">
-          <h3>Próximas Sessões</h3>
-          <div id="proximas-sessoes" className="row g-4"></div>
-        </section>
-      </div>
+        <AppRoutes />
     </>
   )
 }
