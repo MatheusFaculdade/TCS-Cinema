@@ -33,19 +33,17 @@ export function Modal({
 
           <div className="modal-footer">
             <Button
-                        text={btnCancelar}
-                        variant="outline-danger" 
-                        size="md" 
-                        icone="trash-fill"
-                        onClick={onClose}
+                text={btnCancelar}
+                variant="outline-danger" 
+                size="md" 
+                onClick={onClose}
             />
             <Button
-                        text={btnSalvar}
-                        variant="outline-danger" 
-                        type='submit'
-                        size="md" 
-                        icone="trash-fill"
-                        onClick={onClick}
+                text={btnSalvar}
+                variant="success" 
+                type='submit'
+                size="md" 
+                onClick={onClick}
             />
           </div>
         </div>
