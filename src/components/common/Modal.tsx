@@ -1,4 +1,5 @@
 import { ReactNode } from 'react'
+import { Button } from './Button'
 
 interface ModalProps {
   id: string
@@ -31,12 +32,21 @@ export function Modal({
           <div className="modal-body">{body}</div>
 
           <div className="modal-footer">
-            <button type="button" className="btn btn-secondary" onClick={onClose}>
-              {btnCancelar}
-            </button>
-            <button type="button" className="btn btn-primary" onClick={onClick}>
-              {btnSalvar}
-            </button>
+            <Button
+                        text={btnCancelar}
+                        variant="outline-danger" 
+                        size="md" 
+                        icone="trash-fill"
+                        onClick={onClose}
+            />
+            <Button
+                        text={btnSalvar}
+                        variant="outline-danger" 
+                        type='submit'
+                        size="md" 
+                        icone="trash-fill"
+                        onClick={onClick}
+            />
           </div>
         </div>
       </div>

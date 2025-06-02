@@ -124,7 +124,6 @@ export function TicketModal({ show, onClose, onSave, ingressoParaEditar }: Props
             value={cliente}
             onChange={e => setCliente(e.target.value)}
             required
-            placeholder="Ex: João da Silva"
           />
           <Input
             id="cpf"
@@ -133,7 +132,6 @@ export function TicketModal({ show, onClose, onSave, ingressoParaEditar }: Props
             onChange={e => setCpf(e.target.value)}
             required
             type="text"
-            placeholder="Ex: 123.456.789-00"
           />
           <Input
             id="assento"
@@ -141,7 +139,6 @@ export function TicketModal({ show, onClose, onSave, ingressoParaEditar }: Props
             value={assento}
             onChange={e => setAssento(e.target.value)}
             required
-            placeholder="Ex: A10, F05"
           />
 
           <div className="mb-3">
