@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
-import { Modal, Button, Form } from 'react-bootstrap'
 import { Sala } from '../../models/Sala'
+import { Modal } from '../common/Modal'
+import { Input } from '../common/Input'
 
 interface Props {
   show: boolean
@@ -43,26 +44,28 @@ export function SalaModal({ show, onClose, onSave, salaParaEditar }: Props) {
     onClose()
   }
 
+  if (!show) return null
+
   return (
-    <Modal show={show} onHide={onClose}>
-      <Modal.Header closeButton className="bg-dark text-white">
-        <Modal.Title>{salaParaEditar ? 'Editar' : 'Cadastrar'} Sala</Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        <Form>
-          <Form.Control className="mb-2" placeholder="Nome da Sala" value={nome} onChange={e => setNome(e.target.value)} />
-          <Form.Control className="mb-2" type="number" placeholder="Capacidade" value={capacidade} onChange={e => setCapacidade(e.target.value)} />
-          <Form.Select className="mb-2" value={tipo} onChange={e => setTipo(e.target.value)}>
-            <option value="">Tipo</option>
-            <option value="1">2D</option>
-            <option value="2">3D</option>
-          </Form.Select>
-        </Form>
-      </Modal.Body>
-      <Modal.Footer>
-        <Button variant="secondary" onClick={onClose}>Cancelar</Button>
-        <Button variant="primary" onClick={handleSubmit}>Salvar</Button>
-      </Modal.Footer>
-    </Modal>
+    <Modal
+      id="modal-sala"
+      title={salaParaEditar ? 'Editar Sala' : 'Cadastrar Sala'}
+      onClick={handleSubmit}
+      onClose={onClose} 
+      body={
+        <>
+          <Input id="nome" label="Nome da Sala" value={nome} onChange={e => setNome(e.target.value)} required />
+          <Input id="capacidade" type="number" label="Capacidade" value={capacidade} onChange={e => setCapacidade(e.target.value)} required />
+          <div className="mb-2">
+            <label htmlFor="tipo" className="form-label">Tipo</label>
+            <select id="tipo" className="form-select form-select-sm" value={tipo} onChange={e => setTipo(e.target.value)} required>
+              <option value="">Tipo</option>
+              <option value="1">2D</option>
+              <option value="2">3D</option>
+            </select>
+          </div>
+        </>
+      }
+    />
   )
 }

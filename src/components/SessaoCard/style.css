@@ -1,0 +1,12 @@
+.sessao-card {
+    background: #1a1a1a;
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    overflow: hidden;
+    transition: transform 0.2s;
+    width: 260px;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+}
+

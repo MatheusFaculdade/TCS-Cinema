@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
-import { Modal, Button, Form } from 'react-bootstrap'
 import { Filme } from '../../models/Filme'
+import { Modal } from '../common/Modal'
+import { Input } from '../common/Input'
 
 interface Props {
   show: boolean
@@ -39,7 +40,7 @@ export function MovieModal({ show, onClose, onSave, filmeParaEditar }: Props) {
     const { id, value } = e.target
     setForm(prev => ({
       ...prev,
-      [id]: id === 'duration' || id === 'gender' || id === 'classification' ? Number(value) : value,
+      [id]: ['duration', 'gender', 'classification'].includes(id) ? Number(value) : value,
     }))
   }
 
@@ -57,40 +58,85 @@ export function MovieModal({ show, onClose, onSave, filmeParaEditar }: Props) {
     onClose()
   }
 
+  if (!show) return null
+
   return (
-    <Modal show={show} onHide={onClose}>
-      <Modal.Header closeButton className="bg-dark text-white">
-        <Modal.Title>{filmeParaEditar ? 'Editar Filme' : 'Cadastrar Filme'}</Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        <Form>
-          <Form.Control className="mb-2" id="title" placeholder="Título" value={form.title} onChange={handleChange} required />
-          <Form.Control as="textarea" className="mb-2" id="description" placeholder="Descrição" value={form.description} onChange={handleChange} required />
-          <Form.Select className="mb-2" id="gender" value={form.gender} onChange={handleChange} required>
-            <option value={0}>Selecione o Gênero</option>
-            <option value={1}>Ação</option>
-            <option value={2}>Comédia</option>
-            <option value={3}>Drama</option>
-            <option value={4}>Ficção Científica</option>
-            <option value={5}>Terror</option>
-          </Form.Select>
-          <Form.Select className="mb-2" id="classification" value={form.classification} onChange={handleChange} required>
-            <option value={0}>Classificação Indicativa</option>
-            <option value={1}>Livre</option>
-            <option value={2}>10 anos</option>
-            <option value={3}>12 anos</option>
-            <option value={4}>14 anos</option>
-            <option value={5}>16 anos</option>
-            <option value={6}>18 anos</option>
-          </Form.Select>
-          <Form.Control className="mb-2" id="duration" placeholder="Duração (minutos)" type="number" value={form.duration} onChange={handleChange} required />
-          <Form.Control className="mb-2" id="releaseDate" type="date" value={form.releaseDate} onChange={handleChange} required />
-        </Form>
-      </Modal.Body>
-      <Modal.Footer>
-        <Button variant="secondary" onClick={onClose}>Cancelar</Button>
-        <Button variant="primary" onClick={handleSubmit}>Salvar</Button>
-      </Modal.Footer>
-    </Modal>
+    <Modal
+      id="modal-filme"
+      title={filmeParaEditar ? 'Editar Filme' : 'Cadastrar Filme'}
+      onClick={handleSubmit}
+      onClose={onClose} 
+      btnSalvar="Salvar"
+      btnCancelar="Cancelar"
+      body={
+        <>
+          <Input
+            id="title"
+            label="Título"
+            value={form.title}
+            onChange={handleChange}
+            required
+          />
+          <Input
+            id="description"
+            label="Descrição"
+            value={form.description}
+            onChange={handleChange}
+            required
+          />
+          <div className="mb-2">
+            <label htmlFor="gender" className="form-label">Gênero</label>
+            <select
+              id="gender"
+              value={form.gender}
+              onChange={handleChange}
+              className="form-select form-select-sm"
+              required
+            >
+              <option value={0}>Selecione o Gênero</option>
+              <option value={1}>Ação</option>
+              <option value={2}>Comédia</option>
+              <option value={3}>Drama</option>
+              <option value={4}>Ficção Científica</option>
+              <option value={5}>Terror</option>
+            </select>
+          </div>
+          <div className="mb-2">
+            <label htmlFor="classification" className="form-label">Classificação</label>
+            <select
+              id="classification"
+              value={form.classification}
+              onChange={handleChange}
+              className="form-select form-select-sm"
+              required
+            >
+              <option value={0}>Classificação Indicativa</option>
+              <option value={1}>Livre</option>
+              <option value={2}>10 anos</option>
+              <option value={3}>12 anos</option>
+              <option value={4}>14 anos</option>
+              <option value={5}>16 anos</option>
+              <option value={6}>18 anos</option>
+            </select>
+          </div>
+          <Input
+            id="duration"
+            label="Duração (minutos)"
+            type="number"
+            value={form.duration}
+            onChange={handleChange}
+            required
+          />
+          <Input
+            id="releaseDate"
+            label="Data de Lançamento"
+            type="date"
+            value={form.releaseDate}
+            onChange={handleChange}
+            required
+          />
+        </>
+      }
+    />
   )
 }

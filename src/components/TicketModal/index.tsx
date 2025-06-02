@@ -1,90 +1,166 @@
-import { useEffect, useState } from 'react'
-import { Modal, Button, Form } from 'react-bootstrap'
-import { Ingresso } from '../../models/Ingresso'
-import { Sessao } from '../../models/Sessao'
-
+import { useEffect, useState } from 'react';
+import { Ingresso } from '../../models/Ingresso';
+import { Sessao } from '../../models/Sessao';
+import { Modal } from '../common/Modal';
+import { Input } from '../common/Input';
 
 interface Props {
-  show: boolean
-  onClose: () => void
-  onSave: (ingresso: Ingresso) => void
-  ingressoParaEditar?: Ingresso | null
+  show: boolean;
+  onClose: () => void;
+  onSave: (ingresso: Ingresso) => void;
+  ingressoParaEditar?: Ingresso | null;
 }
 
-type SessaoComLabel = Sessao & { label: string }
+type SessaoComLabel = Sessao & { label: string };
 
 export function TicketModal({ show, onClose, onSave, ingressoParaEditar }: Props) {
-  const [sessaoId, setSessaoId] = useState('')
-  const [cliente, setCliente] = useState('')
-  const [cpf, setCpf] = useState('')
-  const [sessoes, setSessoes] = useState<SessaoComLabel[]>([])
+  const [sessaoId, setSessaoId] = useState<string>('');
+  const [cliente, setCliente] = useState<string>('');
+  const [cpf, setCpf] = useState<string>('');
+  const [assento, setAssento] = useState<string>('');
+  const [pagamento, setPagamento] = useState<string>('');
+  const [sessoes, setSessoes] = useState<SessaoComLabel[]>([]);
 
+  const tiposPagamento = [
+    { value: 1, label: 'Cartão' },
+    { value: 2, label: 'Pix' },
+    { value: 3, label: 'Dinheiro' },
+  ];
 
   useEffect(() => {
-    const sessoesLocal = JSON.parse(localStorage.getItem('sessoes') || '[]')
-    const filmes = JSON.parse(localStorage.getItem('filmes') || '[]')
+    if (!show) return;
+
+    const sessoesLocal = JSON.parse(localStorage.getItem('sessoes') || '[]');
+    const filmes = JSON.parse(localStorage.getItem('filmes') || '[]');
 
     const sessoesComFilme = sessoesLocal.map((sessao: Sessao) => {
-      const filme = filmes.find((f: any) => f.id === sessao.filmeId)
+      const filme = filmes.find((f: any) => f.id === sessao.filmeId);
+      const dataHoraFormatada = new Date(sessao.dataHora).toLocaleString('pt-BR', {
+        year: 'numeric',
+        month: 'numeric',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+      });
       return {
         ...sessao,
-        label: `${filme?.title || 'Filme'} - ${new Date(sessao.dataHora).toLocaleString('pt-BR')}`
-      }
-    })
+        label: `${filme?.title || 'Filme Desconhecido'} - Sala ${sessao.salaId} - ${dataHoraFormatada}`,
+      };
+    });
 
-    setSessoes(sessoesComFilme)
-  }, [show])
+    setSessoes(sessoesComFilme);
+  }, [show]);
 
   useEffect(() => {
     if (ingressoParaEditar) {
-      setSessaoId(String(ingressoParaEditar.sessaoId))
-      setCliente(ingressoParaEditar.cliente)
-      setCpf(ingressoParaEditar.cpf)
+      setSessaoId(String(ingressoParaEditar.sessaoId));
+      setCliente(ingressoParaEditar.cliente);
+      setCpf(ingressoParaEditar.cpf);
+      setAssento(ingressoParaEditar.assento);
+      setPagamento(String(ingressoParaEditar.pagamento));
     } else {
-      setSessaoId('')
-      setCliente('')
-      setCpf('')
+      setSessaoId('');
+      setCliente('');
+      setCpf('');
+      setAssento('');
+      setPagamento('');
     }
-  }, [ingressoParaEditar])
+  }, [ingressoParaEditar]);
 
   const handleSubmit = () => {
-    if (!sessaoId || !cliente || !cpf) {
-      alert('Preencha todos os campos!')
-      return
+    if (!sessaoId || !cliente || !cpf || !assento || !pagamento) {
+      alert('Por favor, preencha todos os campos obrigatórios!');
+      return;
     }
 
     const ingresso = new Ingresso(
       ingressoParaEditar?.id ?? Date.now(),
       parseInt(sessaoId),
       cliente,
-      cpf
-    )
+      cpf,
+      assento.toUpperCase(),
+      parseInt(pagamento)
+    );
 
-    onSave(ingresso)
-    onClose()
-  }
+    onSave(ingresso);
+    onClose();
+  };
+
+  if (!show) return null;
 
   return (
-    <Modal show={show} onHide={onClose}>
-      <Modal.Header className="bg-dark text-white" closeButton>
-        <Modal.Title>{ingressoParaEditar ? 'Editar' : 'Novo'} Ingresso</Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        <Form>
-          <Form.Select className="mb-2" value={sessaoId} onChange={e => setSessaoId(e.target.value)} required>
-            <option value="">Selecione a Sessão</option>
-            {sessoes.map(sessao => (
-              <option key={sessao.id} value={sessao.id}>{sessao.label}</option>
-            ))}
-          </Form.Select>
-          <Form.Control className="mb-2" placeholder="Nome do Cliente" value={cliente} onChange={e => setCliente(e.target.value)} required />
-          <Form.Control className="mb-2" placeholder="CPF" value={cpf} onChange={e => setCpf(e.target.value)} required />
-        </Form>
-      </Modal.Body>
-      <Modal.Footer>
-        <Button variant="secondary" onClick={onClose}>Cancelar</Button>
-        <Button variant="primary" onClick={handleSubmit}>Salvar</Button>
-      </Modal.Footer>
-    </Modal>
-  )
+    <Modal
+      id="modal-ingresso"
+      title={ingressoParaEditar ? 'Editar Ingresso' : 'Emitir Novo Ingresso'}
+      onClick={handleSubmit}
+      onClose={onClose}
+      body={
+        <>
+          <div className="mb-3">
+            <label htmlFor="sessaoSelect" className="form-label fw-bold">Sessão <span className="text-danger">*</span></label>
+            <select
+              id="sessaoSelect"
+              className="form-select form-select-sm"
+              value={sessaoId}
+              onChange={e => setSessaoId(e.target.value)}
+              required
+            >
+              <option value="">Selecione a Sessão</option>
+              {sessoes.length === 0 ? (
+                <option disabled>Nenhuma sessão disponível</option>
+              ) : (
+                sessoes.map(sessao => (
+                  <option key={sessao.id} value={sessao.id}>
+                    {sessao.label}
+                  </option>
+                ))
+              )}
+            </select>
+          </div>
+
+          <Input
+            id="cliente"
+            label="Nome do Cliente"
+            value={cliente}
+            onChange={e => setCliente(e.target.value)}
+            required
+            placeholder="Ex: João da Silva"
+          />
+          <Input
+            id="cpf"
+            label="CPF"
+            value={cpf}
+            onChange={e => setCpf(e.target.value)}
+            required
+            type="text"
+            placeholder="Ex: 123.456.789-00"
+          />
+          <Input
+            id="assento"
+            label="Assento"
+            value={assento}
+            onChange={e => setAssento(e.target.value)}
+            required
+            placeholder="Ex: A10, F05"
+          />
+
+          <div className="mb-3">
+            <label htmlFor="pagamentoSelect" className="form-label fw-bold">Tipo de Pagamento <span className="text-danger">*</span></label>
+            <select
+              id="pagamentoSelect"
+              className="form-select form-select-sm"
+              value={pagamento}
+              onChange={e => setPagamento(e.target.value)}
+              required
+            >
+              <option value="">Selecione o Tipo de Pagamento</option>
+              {tiposPagamento.map(tipo => (
+                <option key={tipo.value} value={tipo.value}>{tipo.label}</option>
+              ))}
+            </select>
+          </div>
+        </>
+      }
+    />
+  );
 }

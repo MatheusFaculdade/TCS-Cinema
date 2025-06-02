@@ -1,4 +1,4 @@
-import { Modal, Button } from 'react-bootstrap'
+import { Modal } from '../common/Modal'
 
 interface Props {
   show: boolean
@@ -8,18 +8,19 @@ interface Props {
 }
 
 export function ConfirmationModal({ show, onClose, onConfirm, message }: Props) {
+  if (!show) return null
+
   return (
-    <Modal show={show} onHide={onClose}>
-      <Modal.Header className="bg-dark text-white" closeButton>
-        <Modal.Title>Confirmação</Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
+    <Modal
+      id="modal-confirmacao"
+      title="Confirmação"
+      onClick={onConfirm}
+      onClose={onClose}
+      btnSalvar="Excluir"
+      btnCancelar="Cancelar"
+      body={
         <p>{message || 'Tem certeza que deseja continuar?'}</p>
-      </Modal.Body>
-      <Modal.Footer>
-        <Button variant="secondary" onClick={onClose}>Cancelar</Button>
-        <Button variant="danger" onClick={onConfirm}>Excluir</Button>
-      </Modal.Footer>
-    </Modal>
+      }
+    />
   )
 }

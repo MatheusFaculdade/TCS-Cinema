@@ -1,4 +1,6 @@
 import { Sala } from '../../models/Sala'
+import { Button } from '../common/Button'
+import './style.css' // Importe seu arquivo de estilos, se houver estilos específicos para salaCard
 
 interface Props {
   sala: Sala
@@ -7,24 +9,41 @@ interface Props {
 }
 
 export function SalaCard({ sala, onEdit, onDelete }: Props) {
-  const tipo = sala.tipo === '1' ? '2D' : sala.tipo === '2' ? '3D' : 'Desconhecido'
+  const tiposSala: Record<string, string> = {
+    '1': '2D',
+    '2': '3D',
+    '3': 'IMAX', // Adicionei um exemplo se tiver mais tipos
+    '4': 'XD'
+  }
+  const tipo = tiposSala[sala.tipo] || 'Desconhecido'
 
   return (
-    <div className="col-12 col-sm-6 col-md-4 col-lg-3">
-      <div className="card h-100 shadow card-sala">
-        <div className="card-body d-flex flex-column justify-content-between">
-          <div>
-            <h5 className="card-title">{sala.nome}</h5>
-            <p className="card-text">{sala.capacidade} lugares • {tipo}</p>
-          </div>
-          <div className="d-flex justify-content-end">
-            <button className="btn btn-danger btn-sm" onClick={() => onDelete(sala.id)}>
-              <i className="bi bi-trash-fill"></i>
-            </button>
-            <button className="btn btn-secondary btn-sm ms-2" onClick={() => onEdit(sala)}>
-              Editar
-            </button>
-          </div>
+    <div className="card h-100 shadow-lg border-0 rounded-4 sala-card-custom">
+      <div className="card-body d-flex flex-column justify-content-between p-4">
+        <div>
+          <h5 className="card-title text-truncate fw-bold mb-2">{sala.nome}</h5>
+          <p className="card-text text-secondary mb-1">
+            Capacidade: {sala.capacidade} lugares
+          </p>
+          <p className="card-text text-muted mb-0">
+            Tipo: {tipo}
+          </p>
+        </div>
+        <div className="d-flex justify-content-center gap-3 mt-4">
+          <Button
+            text=""
+            variant="outline-danger"
+            size="md"
+            icone="trash-fill"
+            onClick={() => onDelete(sala.id)}
+          />
+          <Button
+            text="Editar"
+            variant="primary"
+            size="md"
+            icone="pencil-fill"
+            onClick={() => onEdit(sala)}       
+          />
         </div>
       </div>
     </div>

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
-import { Modal, Button, Form } from 'react-bootstrap'
 import { Sessao } from '../../models/Sessao'
+import { Modal } from '../common/Modal'
+import { Input } from '../common/Input'
 
 interface Props {
   show: boolean
@@ -64,43 +65,54 @@ export function SessaoModal({ show, onClose, onSave, sessaoParaEditar }: Props) 
     onClose()
   }
 
+  if (!show) return null
+
   return (
-    <Modal show={show} onHide={onClose}>
-      <Modal.Header className="bg-dark text-white" closeButton>
-        <Modal.Title>{sessaoParaEditar ? 'Editar' : 'Cadastrar'} Sessão</Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        <Form>
-          <Form.Select className="mb-2" value={filmeId} onChange={e => setFilmeId(e.target.value)} required>
-            <option value="">Selecione o Filme</option>
-            {filmes.map(f => (
-              <option key={f.id} value={f.id}>{f.title}</option>
-            ))}
-          </Form.Select>
-          <Form.Select className="mb-2" value={salaId} onChange={e => setSalaId(e.target.value)} required>
-            <option value="">Selecione a Sala</option>
-            {salas.map(s => (
-              <option key={s.id} value={s.id}>{s.nome}</option>
-            ))}
-          </Form.Select>
-          <Form.Control className="mb-2" type="datetime-local" value={dataHora} onChange={e => setDataHora(e.target.value)} required />
-          <Form.Control className="mb-2" type="number" placeholder="Preço" value={preco} onChange={e => setPreco(e.target.value)} required />
-          <Form.Select className="mb-2" value={idioma} onChange={e => setIdioma(e.target.value)} required>
-            <option value="">Idioma</option>
-            <option>Dublado</option>
-            <option>Legendado</option>
-          </Form.Select>
-          <Form.Select className="mb-2" value={formato} onChange={e => setFormato(e.target.value)} required>
-            <option value="">Formato</option>
-            <option>2D</option>
-            <option>3D</option>
-          </Form.Select>
-        </Form>
-      </Modal.Body>
-      <Modal.Footer>
-        <Button variant="secondary" onClick={onClose}>Cancelar</Button>
-        <Button variant="primary" onClick={handleSubmit}>Salvar</Button>
-      </Modal.Footer>
-    </Modal>
+    <Modal
+      id="modal-sessao"
+      title={sessaoParaEditar ? 'Editar Sessão' : 'Cadastrar Sessão'}
+      onClick={handleSubmit}
+      onClose={onClose} 
+      body={
+        <>
+          <div className="mb-2">
+            <label className="form-label">Filme</label>
+            <select className="form-select form-select-sm" value={filmeId} onChange={e => setFilmeId(e.target.value)} required>
+              <option value="">Selecione o Filme</option>
+              {filmes.map(f => (
+                <option key={f.id} value={f.id}>{f.title}</option>
+              ))}
+            </select>
+          </div>
+          <div className="mb-2">
+            <label className="form-label">Sala</label>
+            <select className="form-select form-select-sm" value={salaId} onChange={e => setSalaId(e.target.value)} required>
+              <option value="">Selecione a Sala</option>
+              {salas.map(s => (
+                <option key={s.id} value={s.id}>{s.nome}</option>
+              ))}
+            </select>
+          </div>
+          <Input type="datetime-local" id="dataHora" label="Data e Hora" value={dataHora} onChange={e => setDataHora(e.target.value)} required />
+          <Input type="number" id="preco" label="Preço" value={preco} onChange={e => setPreco(e.target.value)} required />
+          <div className="mb-2">
+            <label className="form-label">Idioma</label>
+            <select className="form-select form-select-sm" value={idioma} onChange={e => setIdioma(e.target.value)} required>
+              <option value="">Idioma</option>
+              <option>Dublado</option>
+              <option>Legendado</option>
+            </select>
+          </div>
+          <div className="mb-2">
+            <label className="form-label">Formato</label>
+            <select className="form-select form-select-sm" value={formato} onChange={e => setFormato(e.target.value)} required>
+              <option value="">Formato</option>
+              <option>2D</option>
+              <option>3D</option>
+            </select>
+          </div>
+        </>
+      }
+    />
   )
 }
