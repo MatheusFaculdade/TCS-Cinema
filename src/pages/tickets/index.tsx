@@ -1,51 +1,71 @@
-import { useEffect, useState } from 'react'
-import { Ingresso } from '../../models/Ingresso'
-import { getAllIngressos, saveIngressos } from '../../services/ingressoService'
-import { TicketCard } from '../../components/TicketCard'
-import { TicketModal } from '../../components/TicketModal'
-import { ConfirmationModal } from '../../components/ConfirmationModal'
+import { useEffect, useState } from 'react';
+import { Ingresso } from '../../models/Ingresso';
+import { ingressoService } from '../../services/ingressoService';
+import { TicketCard } from '../../components/TicketCard';
+import { TicketModal } from '../../components/TicketModal';
+import { ConfirmationModal } from '../../components/ConfirmationModal';
 
 export function Ingressos() {
-  const [ingressos, setIngressos] = useState<Ingresso[]>([])
-  const [ingressoEdit, setIngressoEdit] = useState<Ingresso | null>(null)
-  const [idParaExcluir, setIdParaExcluir] = useState<number | null>(null)
-  const [showModal, setShowModal] = useState(false)
-  const [showConfirm, setShowConfirm] = useState(false)
+  const [ingressos, setIngressos] = useState<Ingresso[]>([]);
+  const [ingressoEdit, setIngressoEdit] = useState<Ingresso | null>(null);
+  const [idParaExcluir, setIdParaExcluir] = useState<string | null>(null);
+  const [showModal, setShowModal] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
 
   useEffect(() => {
-    setIngressos(getAllIngressos())
-  }, [])
+    async function fetchIngressos() {
+      try {
+        const data = await ingressoService.getAll();
+        setIngressos(data);
+      } catch (err) {
+        console.error('Erro ao buscar ingressos:', err);
+      }
+    }
+
+    fetchIngressos();
+  }, []);
 
   const openModal = (ingresso?: Ingresso) => {
-    setIngressoEdit(ingresso ?? null)
-    setShowModal(true)
-  }
+    setIngressoEdit(ingresso ?? null);
+    setShowModal(true);
+  };
 
-  const handleSave = (ingresso: Ingresso) => {
-    const novaLista = ingressoEdit
-      ? ingressos.map(i => (i.id === ingresso.id ? i : i))
-      : [...ingressos, { ...ingresso, id: ingressos.length > 0 ? Math.max(...ingressos.map(i => i.id)) + 1 : 1 }]
+  const handleSave = async (ingresso: Ingresso) => {
+    try {
+      if (ingressoEdit) {
+        await ingressoService.update(ingresso.id, ingresso);
+      } else {
+        await ingressoService.create(ingresso);
+      }
 
-    setIngressos(novaLista)
-    saveIngressos(novaLista)
-    setShowModal(false)
-  }
-
-  const handleEdit = (ingresso: Ingresso) => openModal(ingresso)
-
-  const handleDelete = (id: number) => {
-    setIdParaExcluir(id)
-    setShowConfirm(true)
-  }
-
-  const confirmarExclusao = () => {
-    if (idParaExcluir != null) {
-      const novaLista = ingressos.filter(i => i.id !== idParaExcluir)
-      setIngressos(novaLista)
-      saveIngressos(novaLista)
-      setShowConfirm(false)
+      const data = await ingressoService.getAll();
+      setIngressos(data);
+      setShowModal(false);
+    } catch (err) {
+      console.error('Erro ao salvar ingresso:', err);
     }
-  }
+  };
+
+  const handleEdit = (ingresso: Ingresso) => openModal(ingresso);
+
+  const handleDelete = (id: string) => {
+    setIdParaExcluir(id);
+    setShowConfirm(true);
+  };
+
+  const confirmarExclusao = async () => {
+    if (idParaExcluir) {
+      try {
+        await ingressoService.delete(idParaExcluir);
+        const data = await ingressoService.getAll();
+        setIngressos(data);
+      } catch (err) {
+        console.error('Erro ao excluir ingresso:', err);
+      } finally {
+        setShowConfirm(false);
+      }
+    }
+  };
 
   return (
     <div className="container py-5">
@@ -65,9 +85,9 @@ export function Ingressos() {
         </div>
       ) : (
         <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-4">
-          {ingressos.map(i => (
+          {ingressos.map((i) => (
             <div className="col" key={i.id}>
-              <TicketCard ingresso={i} onEdit={handleEdit} onDelete={handleDelete} />
+              <TicketCard ingresso={i} onEdit={handleEdit} onDelete={() => handleDelete(i.id)} />
             </div>
           ))}
         </div>
@@ -86,5 +106,5 @@ export function Ingressos() {
         message="Tem certeza que deseja excluir este ingresso?"
       />
     </div>
-  )
+  );
 }

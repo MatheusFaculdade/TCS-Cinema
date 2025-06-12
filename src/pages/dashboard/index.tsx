@@ -1,10 +1,9 @@
 import { useEffect, useState } from 'react';
 import { Ingresso } from '../../models/Ingresso';
-import { Sessao } from '../../models/Sessao';     
-import { Filme } from '../../models/Filme';      
-import { getAllIngressos } from '../../services/ingressoService';
-import { getAllSessoes } from '../../services/sessaoService';
-import { getAllFilmes } from '../../services/filmeService';
+import { Sessao } from '../../models/Sessao';
+import { ingressoService } from '../../services/ingressoService';
+import { sessaoService } from '../../services/sessaoService';
+import { movieService } from '../../services/filmeService';
 
 interface DashboardIngresso extends Ingresso {
   filmeTitulo?: string;
@@ -20,35 +19,51 @@ export function Dashboard() {
   const [proximasSessoes, setProximasSessoes] = useState<DashboardSessao[]>([]);
 
   useEffect(() => {
-    const ingressosRaw: Ingresso[] = getAllIngressos();
-    const sessoesRaw: Sessao[] = getAllSessoes();
-    const filmesRaw: Filme[] = getAllFilmes();
-    const ultimos = ingressosRaw.slice(-3).reverse().map(ingresso => {
-      const sessao = sessoesRaw.find(s => s.id === ingresso.sessaoId);
-      const filme = filmesRaw.find(f => f.id === sessao?.filmeId);
-      return {
-        ...ingresso,
-        filmeTitulo: filme?.title || 'Filme Desconhecido',
-        dataHoraSessao: new Date(sessao?.dataHora || '').toLocaleString('pt-BR'),
-      };
-    });
-    setUltimosIngressos(ultimos);
+    async function carregarDashboard() {
+      try {
+        const [ingressosRaw, sessoesRaw, filmesRaw] = await Promise.all([
+          ingressoService.getAll(),
+          sessaoService.getAll(),
+          movieService.getAll(),
+        ]);
 
-    // Processar Próximas Sessões
-    const agora = new Date();
-    const futuras = sessoesRaw
-      .filter(s => new Date(s.dataHora) > agora)
-      .sort((a, b) => new Date(a.dataHora).getTime() - new Date(b.dataHora).getTime())
-      .slice(0, 3)
-      .map(sessao => {
-        const filme = filmesRaw.find(f => f.id === sessao.filmeId);
-        return {
-          ...sessao,
-          filmeTitulo: filme?.title || 'Filme Desconhecido',
-        };
-      });
-    setProximasSessoes(futuras);
+        // Últimos Ingressos
+        const ultimos = ingressosRaw
+          .slice(-3)
+          .reverse()
+          .map((ingresso) => {
+            const sessao = sessoesRaw.find((s) => s.id === ingresso.sessaoId);
+            const filme = filmesRaw.find((f) => f.id === sessao?.filmeId);
+            return {
+              ...ingresso,
+              filmeTitulo: filme?.title || 'Filme Desconhecido',
+              dataHoraSessao: new Date(sessao?.dataHora || '').toLocaleString('pt-BR'),
+            };
+          });
 
+        setUltimosIngressos(ultimos);
+
+        // Próximas Sessões
+        const agora = new Date();
+        const futuras = sessoesRaw
+          .filter((s) => new Date(s.dataHora) > agora)
+          .sort((a, b) => new Date(a.dataHora).getTime() - new Date(b.dataHora).getTime())
+          .slice(0, 3)
+          .map((sessao) => {
+            const filme = filmesRaw.find((f) => f.id === sessao.filmeId);
+            return {
+              ...sessao,
+              filmeTitulo: filme?.title || 'Filme Desconhecido',
+            };
+          });
+
+        setProximasSessoes(futuras);
+      } catch (error) {
+        console.error('Erro ao carregar o dashboard:', error);
+      }
+    }
+
+    carregarDashboard();
   }, []);
 
   return (
@@ -67,7 +82,7 @@ export function Dashboard() {
           </div>
         ) : (
           <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-            {ultimosIngressos.map(ingresso => (
+            {ultimosIngressos.map((ingresso) => (
               <div className="col" key={ingresso.id}>
                 <div className="card h-100 shadow-sm border-0 rounded-3">
                   <div className="card-body">
@@ -82,7 +97,12 @@ export function Dashboard() {
                       <i className="bi bi-person-fill me-1"></i> CPF: {ingresso.cpf}
                     </p>
                     <p className="card-text mb-0">
-                      <i className="bi bi-currency-dollar me-1"></i> Pagamento: {ingresso.pagamento === 1 ? 'Cartão' : ingresso.pagamento === 2 ? 'Pix' : 'Dinheiro'}
+                      <i className="bi bi-currency-dollar me-1"></i> Pagamento:{' '}
+                      {ingresso.pagamento === 1
+                        ? 'Cartão'
+                        : ingresso.pagamento === 2
+                        ? 'Pix'
+                        : 'Dinheiro'}
                     </p>
                   </div>
                 </div>
@@ -103,13 +123,14 @@ export function Dashboard() {
           </div>
         ) : (
           <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-            {proximasSessoes.map(sessao => (
+            {proximasSessoes.map((sessao) => (
               <div className="col" key={sessao.id}>
                 <div className="card h-100 shadow-sm border-0 rounded-3">
                   <div className="card-body">
                     <h5 className="card-title fw-bold text-truncate">{sessao.filmeTitulo}</h5>
                     <p className="card-text mb-1">
-                      <i className="bi bi-calendar-event me-1"></i> Data/Hora: {new Date(sessao.dataHora).toLocaleString("pt-BR")}
+                      <i className="bi bi-calendar-event me-1"></i> Data/Hora:{' '}
+                      {new Date(sessao.dataHora).toLocaleString('pt-BR')}
                     </p>
                     <p className="card-text mb-1">
                       <i className="bi bi-aspect-ratio me-1"></i> Formato: {sessao.formato}

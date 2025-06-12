@@ -1,11 +1,23 @@
-import { Sala } from '../models/Sala'
+import { api } from './api';
+import { Sala } from '../models/Sala';
 
-const STORAGE_KEY = 'salas'
+export const salaService = {
+  async getAll(): Promise<Sala[]> {
+    const res = await api.get('/salas');
+    return res.data;
+  },
 
-export function getAllSalas(): Sala[] {
-  return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]')
-}
+  async create(sala: Sala): Promise<Sala> {
+    const res = await api.post('/salas', sala);
+    return res.data;
+  },
 
-export function saveSalas(salas: Sala[]) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(salas))
-}
+  async update(id: string, data: Partial<Sala>): Promise<Sala> {
+    const res = await api.put(`/salas/${id}`, data);
+    return res.data;
+  },
+
+  async delete(id: string): Promise<void> {
+    await api.delete(`/salas/${id}`);
+  }
+};

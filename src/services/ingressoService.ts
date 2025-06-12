@@ -1,11 +1,23 @@
-import { Ingresso } from '../models/Ingresso'
+import { api } from './api';
+import { Ingresso } from '../models/Ingresso';
 
-const STORAGE_KEY = 'ingressos'
+export const ingressoService = {
+  async getAll(): Promise<Ingresso[]> {
+    const res = await api.get('/ingressos');
+    return res.data;
+  },
 
-export function getAllIngressos(): Ingresso[] {
-  return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]')
-}
+  async create(ingresso: Ingresso): Promise<Ingresso> {
+    const res = await api.post('/ingressos', ingresso);
+    return res.data;
+  },
 
-export function saveIngressos(lista: Ingresso[]) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(lista))
-}
+  async update(id: string, data: Partial<Ingresso>): Promise<Ingresso> {
+    const res = await api.put(`/ingressos/${id}`, data);
+    return res.data;
+  },
+
+  async delete(id: string): Promise<void> {
+    await api.delete(`/ingressos/${id}`);
+  }
+};

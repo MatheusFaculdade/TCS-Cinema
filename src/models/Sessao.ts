@@ -1,8 +1,8 @@
 export class Sessao {
   constructor(
-    public id: number,
-    public filmeId: number,
-    public salaId: number,
+    public id: string,
+    public filmeId: string,
+    public salaId: string,
     public dataHora: string,
     public preco: number,
     public idioma: string,

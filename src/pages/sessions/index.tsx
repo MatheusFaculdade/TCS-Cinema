@@ -1,51 +1,71 @@
-import { useEffect, useState } from 'react'
-import { Sessao } from '../../models/Sessao'
-import { getAllSessoes, saveSessoes } from '../../services/sessaoService'
-import { SessaoCard } from '../../components/SessaoCard'
-import { SessaoModal } from '../../components/SessaoModal'
-import { ConfirmationModal } from '../../components/ConfirmationModal'
+import { useEffect, useState } from 'react';
+import { Sessao } from '../../models/Sessao';
+import { sessaoService } from '../../services/sessaoService';
+import { SessaoCard } from '../../components/SessaoCard';
+import { SessaoModal } from '../../components/SessaoModal';
+import { ConfirmationModal } from '../../components/ConfirmationModal';
 
 export function Sessoes() {
-  const [sessoes, setSessoes] = useState<Sessao[]>([])
-  const [sessaoEdit, setSessaoEdit] = useState<Sessao | null>(null)
-  const [idParaExcluir, setIdParaExcluir] = useState<number | null>(null)
-  const [showModal, setShowModal] = useState(false)
-  const [showConfirm, setShowConfirm] = useState(false)
+  const [sessoes, setSessoes] = useState<Sessao[]>([]);
+  const [sessaoEdit, setSessaoEdit] = useState<Sessao | null>(null);
+  const [idParaExcluir, setIdParaExcluir] = useState<string | null>(null);
+  const [showModal, setShowModal] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
 
   useEffect(() => {
-    setSessoes(getAllSessoes())
-  }, [])
+    async function fetchSessoes() {
+      try {
+        const data = await sessaoService.getAll();
+        setSessoes(data);
+      } catch (err) {
+        console.error('Erro ao buscar sessões:', err);
+      }
+    }
+
+    fetchSessoes();
+  }, []);
 
   const openModal = (sessao?: Sessao) => {
-    setSessaoEdit(sessao ?? null)
-    setShowModal(true)
-  }
+    setSessaoEdit(sessao ?? null);
+    setShowModal(true);
+  };
 
-  const handleSave = (sessao: Sessao) => {
-    const novaLista = sessaoEdit
-      ? sessoes.map(s => (s.id === sessao.id ? sessao : s))
-      : [...sessoes, { ...sessao, id: sessoes.length > 0 ? Math.max(...sessoes.map(s => s.id)) + 1 : 1 }]
+  const handleSave = async (sessao: Sessao) => {
+    try {
+      if (sessaoEdit) {
+        await sessaoService.update(sessao.id, sessao);
+      } else {
+        await sessaoService.create(sessao);
+      }
 
-    setSessoes(novaLista)
-    saveSessoes(novaLista)
-    setShowModal(false)
-  }
-
-  const handleEdit = (sessao: Sessao) => openModal(sessao)
-
-  const handleDelete = (id: number) => {
-    setIdParaExcluir(id)
-    setShowConfirm(true)
-  }
-
-  const confirmarExclusao = () => {
-    if (idParaExcluir != null) {
-      const novaLista = sessoes.filter(s => s.id !== idParaExcluir)
-      setSessoes(novaLista)
-      saveSessoes(novaLista)
-      setShowConfirm(false)
+      const data = await sessaoService.getAll();
+      setSessoes(data);
+      setShowModal(false);
+    } catch (err) {
+      console.error('Erro ao salvar sessão:', err);
     }
-  }
+  };
+
+  const handleEdit = (sessao: Sessao) => openModal(sessao);
+
+  const handleDelete = (id: string) => {
+    setIdParaExcluir(id);
+    setShowConfirm(true);
+  };
+
+  const confirmarExclusao = async () => {
+    if (idParaExcluir) {
+      try {
+        await sessaoService.delete(idParaExcluir);
+        const data = await sessaoService.getAll();
+        setSessoes(data);
+      } catch (err) {
+        console.error('Erro ao excluir sessão:', err);
+      } finally {
+        setShowConfirm(false);
+      }
+    }
+  };
 
   return (
     <div className="container py-5">
@@ -65,9 +85,9 @@ export function Sessoes() {
         </div>
       ) : (
         <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-4">
-          {sessoes.map(s => (
+          {sessoes.map((s) => (
             <div className="col" key={s.id}>
-              <SessaoCard sessao={s} onEdit={handleEdit} onDelete={handleDelete} />
+              <SessaoCard sessao={s} onEdit={handleEdit} onDelete={() => handleDelete(s.id)} />
             </div>
           ))}
         </div>
@@ -79,6 +99,7 @@ export function Sessoes() {
         onSave={handleSave}
         sessaoParaEditar={sessaoEdit}
       />
+
       <ConfirmationModal
         show={showConfirm}
         onClose={() => setShowConfirm(false)}
@@ -86,5 +107,5 @@ export function Sessoes() {
         message="Tem certeza que deseja excluir esta sessão?"
       />
     </div>
-  )
+  );
 }
