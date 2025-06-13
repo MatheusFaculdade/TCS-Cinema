@@ -33,14 +33,14 @@ export function SalaModal({ show, onClose, onSave, salaParaEditar }: Props) {
       return
     }
 
-    const sala = new Sala(
-      salaParaEditar?.id ?? Date.now(),
+    const novaSala = new Sala(
+      salaParaEditar?.id ?? Date.now().toString(),
       nome,
       parseInt(capacidade),
       tipo
     )
 
-    onSave(sala)
+    onSave(novaSala)
     onClose()
   }
 
@@ -51,17 +51,36 @@ export function SalaModal({ show, onClose, onSave, salaParaEditar }: Props) {
       id="modal-sala"
       title={salaParaEditar ? 'Editar Sala' : 'Cadastrar Sala'}
       onClick={handleSubmit}
-      onClose={onClose} 
+      onClose={onClose}
       body={
         <>
-          <Input id="nome" label="Nome da Sala" value={nome} onChange={e => setNome(e.target.value)} required />
-          <Input id="capacidade" type="number" label="Capacidade" value={capacidade} onChange={e => setCapacidade(e.target.value)} required />
+          <Input
+            id="nome"
+            label="Nome da Sala"
+            value={nome}
+            onChange={e => setNome(e.target.value)}
+            required
+          />
+          <Input
+            id="capacidade"
+            type="number"
+            label="Capacidade"
+            value={capacidade}
+            onChange={e => setCapacidade(e.target.value)}
+            required
+          />
           <div className="mb-2">
             <label htmlFor="tipo" className="form-label">Tipo</label>
-            <select id="tipo" className="form-select form-select-sm" value={tipo} onChange={e => setTipo(e.target.value)} required>
+            <select
+              id="tipo"
+              className="form-select form-select-sm"
+              value={tipo}
+              onChange={e => setTipo(e.target.value)}
+              required
+            >
               <option value="">Tipo</option>
-              <option value="1">2D</option>
-              <option value="2">3D</option>
+              <option value="2D">2D</option>
+              <option value="3D">3D</option>
             </select>
           </div>
         </>

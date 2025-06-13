@@ -45,16 +45,24 @@ export function MovieModal({ show, onClose, onSave, filmeParaEditar }: Props) {
   }
 
   const handleSubmit = () => {
-    const filme = new Filme(
-      filmeParaEditar?.id ?? Date.now(),
-      form.title,
-      form.description,
-      form.gender,
-      form.classification,
-      form.duration,
-      form.releaseDate
+    const { title, description, gender, classification, duration, releaseDate } = form
+
+    if (!title || !description || !gender || !classification || !duration || !releaseDate) {
+      alert('Preencha todos os campos obrigatórios.')
+      return
+    }
+
+    const novoFilme = new Filme(
+      filmeParaEditar?.id ?? Date.now().toString(),
+      title,
+      description,
+      gender,
+      classification,
+      duration,
+      releaseDate
     )
-    onSave(filme)
+
+    onSave(novoFilme)
     onClose()
   }
 
@@ -65,7 +73,7 @@ export function MovieModal({ show, onClose, onSave, filmeParaEditar }: Props) {
       id="modal-filme"
       title={filmeParaEditar ? 'Editar Filme' : 'Cadastrar Filme'}
       onClick={handleSubmit}
-      onClose={onClose} 
+      onClose={onClose}
       btnSalvar="Salvar"
       btnCancelar="Cancelar"
       body={

@@ -1,30 +1,36 @@
-import { Ingresso } from '../../models/Ingresso'
-import { Button } from '../common/Button'
-import './style.css'
+import { Ingresso } from '../../models/Ingresso';
+import { Button } from '../common/Button';
+import './style.css';
 
-interface Props {
-  ingresso: Ingresso
-  onEdit: (ingresso: Ingresso) => void
-  onDelete: (id: number) => void
+interface SessaoComFilme {
+  id: string;
+  dataHora: string;
+  salaId: string;
+  filme: {
+    id: string;
+    title: string;
+  };
 }
 
-export function TicketCard({ ingresso, onEdit, onDelete }: Props) {
-  const sessoes = JSON.parse(localStorage.getItem('sessoes') || '[]')
-  const filmes = JSON.parse(localStorage.getItem('filmes') || '[]')
+interface Props {
+  ingresso: Ingresso;
+  onEdit: (ingresso: Ingresso) => void;
+  onDelete: (id: string) => void;
+  sessao?: SessaoComFilme;
+}
 
-  const sessao = sessoes.find((s: any) => s.id === ingresso.sessaoId)
-  const filme = filmes.find((f: any) => f.id === sessao?.filmeId)
-
+export function TicketCard({ ingresso, onEdit, onDelete, sessao }: Props) {
   const dataHoraFormatada = sessao?.dataHora
     ? new Date(sessao.dataHora).toLocaleString('pt-BR')
-    : 'Desconhecido'
+    : 'Desconhecida';
 
   const tiposPagamento: Record<number, string> = {
     1: 'Cartão',
     2: 'Pix',
     3: 'Dinheiro',
-  }
-  const pagamentoTexto = tiposPagamento[ingresso.pagamento] || 'Não Informado'
+  };
+
+  const pagamentoTexto = tiposPagamento[ingresso.pagamento] || 'Não Informado';
 
   return (
     <div className="card h-100 shadow-lg border-0 rounded-4 ticket-card-custom">
@@ -37,7 +43,7 @@ export function TicketCard({ ingresso, onEdit, onDelete }: Props) {
             CPF: {ingresso.cpf}
           </p>
           <p className="card-text text-muted mb-1">
-            Filme: {filme?.title || 'Desconhecido'}
+            Filme: {sessao?.filme.title || 'Desconhecido'}
           </p>
           <p className="card-text text-muted mb-1">
             Sessão: {dataHoraFormatada}
@@ -67,5 +73,5 @@ export function TicketCard({ ingresso, onEdit, onDelete }: Props) {
         </div>
       </div>
     </div>
-  )
+  );
 }

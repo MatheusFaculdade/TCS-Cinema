@@ -3,6 +3,8 @@ import { Ingresso } from '../../models/Ingresso';
 import { Sessao } from '../../models/Sessao';
 import { Modal } from '../common/Modal';
 import { Input } from '../common/Input';
+import { sessaoService } from '../../services/sessaoService';
+import { movieService } from '../../services/filmeService';
 
 interface Props {
   show: boolean;
@@ -28,32 +30,41 @@ export function TicketModal({ show, onClose, onSave, ingressoParaEditar }: Props
   ];
 
   useEffect(() => {
-    if (!show) return;
+    async function carregarSessoesComLabel() {
+      try {
+        const sessoesRes = await sessaoService.getAll();
+        const filmesRes = await movieService.getAll();
 
-    const sessoesLocal = JSON.parse(localStorage.getItem('sessoes') || '[]');
-    const filmes = JSON.parse(localStorage.getItem('filmes') || '[]');
+        const sessoesComFilme = sessoesRes.map(sessao => {
+          const filme = filmesRes.find(f => f.id === sessao.filmeId);
+          const dataHoraFormatada = new Date(sessao.dataHora).toLocaleString('pt-BR', {
+            year: 'numeric',
+            month: 'numeric',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+          });
+          return {
+            ...sessao,
+            label: `${filme?.title || 'Filme Desconhecido'} - Sala ${sessao.salaId} - ${dataHoraFormatada}`,
+          };
+        });
 
-    const sessoesComFilme = sessoesLocal.map((sessao: Sessao) => {
-      const filme = filmes.find((f: any) => f.id === sessao.filmeId);
-      const dataHoraFormatada = new Date(sessao.dataHora).toLocaleString('pt-BR', {
-        year: 'numeric',
-        month: 'numeric',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-      });
-      return {
-        ...sessao,
-        label: `${filme?.title || 'Filme Desconhecido'} - Sala ${sessao.salaId} - ${dataHoraFormatada}`,
-      };
-    });
+        setSessoes(sessoesComFilme);
+      } catch (err) {
+        console.error('Erro ao carregar sessões:', err);
+        setSessoes([]);
+      }
+    }
 
-    setSessoes(sessoesComFilme);
+    if (show) {
+      carregarSessoesComLabel();
+    }
   }, [show]);
 
   useEffect(() => {
     if (ingressoParaEditar) {
-      setSessaoId(String(ingressoParaEditar.sessaoId));
+      setSessaoId(ingressoParaEditar.sessaoId);
       setCliente(ingressoParaEditar.cliente);
       setCpf(ingressoParaEditar.cpf);
       setAssento(ingressoParaEditar.assento);
@@ -74,8 +85,8 @@ export function TicketModal({ show, onClose, onSave, ingressoParaEditar }: Props
     }
 
     const ingresso = new Ingresso(
-      ingressoParaEditar?.id ?? Date.now(),
-      parseInt(sessaoId),
+      ingressoParaEditar?.id ?? '',
+      sessaoId,
       cliente,
       cpf,
       assento.toUpperCase(),

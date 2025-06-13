@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react'
 import { Sessao } from '../../models/Sessao'
 import { Modal } from '../common/Modal'
 import { Input } from '../common/Input'
+import { movieService } from '../../services/filmeService'
+import { salaService } from '../../services/salaService'
 
 interface Props {
   show: boolean
@@ -21,16 +23,16 @@ export function SessaoModal({ show, onClose, onSave, sessaoParaEditar }: Props) 
   const [salas, setSalas] = useState<any[]>([])
 
   useEffect(() => {
-    const filmesLocal = JSON.parse(localStorage.getItem('filmes') || '[]')
-    const salasLocal = JSON.parse(localStorage.getItem('salas') || '[]')
-    setFilmes(filmesLocal)
-    setSalas(salasLocal)
+    if (show) {
+      movieService.getAll().then(setFilmes).catch(console.error)
+      salaService.getAll().then(setSalas).catch(console.error)
+    }
   }, [show])
 
   useEffect(() => {
     if (sessaoParaEditar) {
-      setFilmeId(sessaoParaEditar.filmeId.toString())
-      setSalaId(sessaoParaEditar.salaId.toString())
+      setFilmeId(sessaoParaEditar.filmeId)
+      setSalaId(sessaoParaEditar.salaId)
       setDataHora(sessaoParaEditar.dataHora)
       setPreco(sessaoParaEditar.preco.toString())
       setIdioma(sessaoParaEditar.idioma)
@@ -52,9 +54,9 @@ export function SessaoModal({ show, onClose, onSave, sessaoParaEditar }: Props) 
     }
 
     const sessao = new Sessao(
-      sessaoParaEditar?.id ?? Date.now(),
-      parseInt(filmeId),
-      parseInt(salaId),
+      sessaoParaEditar?.id ?? '', // string vazia para novo (será ignorado no back)
+      filmeId,
+      salaId,
       dataHora,
       parseFloat(preco),
       idioma,
@@ -72,7 +74,7 @@ export function SessaoModal({ show, onClose, onSave, sessaoParaEditar }: Props) 
       id="modal-sessao"
       title={sessaoParaEditar ? 'Editar Sessão' : 'Cadastrar Sessão'}
       onClick={handleSubmit}
-      onClose={onClose} 
+      onClose={onClose}
       body={
         <>
           <div className="mb-2">

@@ -8,7 +8,8 @@ export const salaService = {
   },
 
   async create(sala: Sala): Promise<Sala> {
-    const res = await api.post('/salas', sala);
+    const { id, ...salaAux } = sala; 
+    const res = await api.post('/salas', salaAux);
     return res.data;
   },
 

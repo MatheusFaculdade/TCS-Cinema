@@ -8,8 +8,9 @@ export const movieService = {
   },
 
   async create(filme: Filme): Promise<Filme> {
-    const res = await api.post('/filmes', filme);
-    return res.data;
+  const { id, ...filmeSemId } = filme; 
+  const res = await api.post('/filmes', filmeSemId);
+  return res.data;
   },
 
   async update(id: string, data: Partial<Filme>): Promise<Filme> {

@@ -5,7 +5,7 @@ import './style.css' // Importe seu arquivo de estilos, se houver estilos especÃ
 interface Props {
   sala: Sala
   onEdit: (sala: Sala) => void
-  onDelete: (id: number) => void
+  onDelete: (id: string) => void
 }
 
 export function SalaCard({ sala, onEdit, onDelete }: Props) {

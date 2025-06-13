@@ -8,7 +8,8 @@ export const ingressoService = {
   },
 
   async create(ingresso: Ingresso): Promise<Ingresso> {
-    const res = await api.post('/ingressos', ingresso);
+    const { id, ...ticketSemId } = ingresso; 
+    const res = await api.post('/ingressos', ticketSemId);
     return res.data;
   },
 

@@ -35,7 +35,11 @@ export function Sessoes() {
       if (sessaoEdit) {
         await sessaoService.update(sessao.id, sessao);
       } else {
-        await sessaoService.create(sessao);
+        await sessaoService.create({
+      ...sessao,
+        filmeId: String(sessao.filmeId),
+        salaId: String(sessao.salaId),
+      });
       }
 
       const data = await sessaoService.getAll();

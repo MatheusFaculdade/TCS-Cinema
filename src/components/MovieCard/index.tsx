@@ -6,7 +6,7 @@ interface Props {
   filme: Filme;
   imageUrl: string;
   onEdit: (filme: Filme) => void;
-  onDelete: (id: number) => void;
+  onDelete: (id: string) => void;
 }
 
 export function MovieCard({ filme, imageUrl, onEdit, onDelete }: Props) {
