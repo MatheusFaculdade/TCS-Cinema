@@ -1,0 +1,71 @@
+/* --- Base Styles / Estilos Base --- */
+:root {
+  --color-primary: #646cff; /* Cor primária, baseada no #646cff */
+  --color-secondary: #61dafb; /* Cor secundária, baseada no #61dafb (React blue/green) */
+  --text-color-muted: #888; /* Cor para texto desabilitado/neutro */
+  --shadow-default: 0 0 2em; /* Padrão de sombra para logos */
+  --spacing-card-padding: 2em; /* Padding específico para .card se não for via Bootstrap utilities */
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh; /* Garante que o body ocupa a altura total da viewport */
+  line-height: 1.5; /* Melhora a legibilidade do texto */
+  -webkit-font-smoothing: antialiased; /* Suaviza a renderização de fontes */
+  font-family:
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    Roboto,
+    Oxygen,
+    Ubuntu,
+    Cantarell,
+    'Open Sans',
+    'Helvetica Neue',
+    sans-serif; /* Fonte genérica de sistema para melhor performance */
+}
+
+/* Garante que o contêiner principal da aplicação ocupe a largura total */
+#main-content {
+  width: 100%;
+  /* Como você está usando Bootstrap containers (container, container-fluid),
+     esta regra pode ser redundante dependendo de onde #main-content é aplicada.
+     Geralmente, o layout é controlado pelas classes do Bootstrap. */
+}
+
+
+/* --- Logo and Animation Styles / Estilos do Logo e Animação --- */
+/* Estes estilos parecem vir de templates de projeto (Vite/CRA) */
+.logo {
+  height: 6em;
+  padding: 1.5em;
+  will-change: filter;
+  transition: filter 300ms ease-out; /* Transição mais suave para o filtro */
+}
+
+.logo:hover {
+  filter: drop-shadow(var(--shadow-default) var(--color-primary)); /* Usando variável CSS */
+}
+
+.logo.react:hover {
+  filter: drop-shadow(var(--shadow-default) var(--color-secondary)); /* Usando variável CSS */
+}
+
+@keyframes logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Animação para logos que não estão em modo de redução de movimento */
+@media (prefers-reduced-motion: no-preference) {
+  a:nth-of-type(2) .logo {
+    animation: logo-spin infinite 20s linear;
+  }
+}
+

@@ -1,0 +1,52 @@
+.sala-card {
+    background: #1a1a1a;
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    overflow: hidden;
+    transition: transform 0.2s;
+    width: 260px;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+}
+
+.sala-card:hover {
+    transform: translateY(-8px) scale(1.03);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+}
+
+.sala-card__poster {
+    width: 100%;
+    height: 390px;
+    object-fit: cover;
+    background: #222;
+}
+
+.sala-card__content {
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.sala-card__title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin: 0;
+    color: #ffd700;
+}
+
+.sala-card__info {
+    font-size: 0.95rem;
+    color: #ccc;
+}
+
+.sala-card__description {
+    font-size: 0.92rem;
+    color: #b0b0b0;
+    margin-top: 8px;
+    line-height: 1.4;
+    max-height: 60px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
